@@ -38,8 +38,6 @@ Ideal para:
 ```bash
 .
 ├── index.html
-├── style.css      # (opcional)
-├── script.js      # (opcional)
 └── README.md
 ```
 
@@ -56,32 +54,6 @@ index.html
 ```
 
 ou arrastar para o navegador.
-
----
-
-## ☁️ Deploy
-
-Este projeto pode ser facilmente publicado na:
-
-* Vercel
-* GitHub (GitHub Pages)
-
-### Deploy na Vercel
-
-1. Suba o projeto no GitHub
-2. Conecte na Vercel
-3. Deploy automático 🚀
-
----
-
-## 📌 Possíveis melhorias futuras
-
-* [ ] Remover nomes já sorteados
-* [ ] Sortear múltiplos nomes
-* [ ] Animação de sorteio
-* [ ] Histórico de resultados
-* [ ] Importação de lista via CSV
-* [ ] Interface mais moderna (UI/UX)
 
 ---
 
