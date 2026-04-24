@@ -1,0 +1,674 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>Sorteio Animado</title>
+<link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=DM+Sans:wght@300;400;500;700&display=swap" rel="stylesheet"/>
+<style>
+/* ============================================================
+   TOKENS
+   ============================================================ */
+:root {
+  --g0: #003318;
+  --g1: #007a27;
+  --g2: #00a335;
+  --g3: #00c441;
+  --g4: #b8f0cc;
+  --g5: #e6f9ed;
+  --g6: #f0faf3;
+  --white: #ffffff;
+  --text-dark: #0d2b14;
+  --text-mid: #2d5e3a;
+  --text-soft: #5a8c68;
+  --red: #cc2200;
+  --red-hover: #aa1a00;
+  --shadow: 0 4px 24px rgba(0,100,40,.13);
+  --radius: 14px;
+  --font-display: 'Bebas Neue', sans-serif;
+  --font-body: 'DM Sans', sans-serif;
+}
+
+/* ============================================================
+   RESET & BASE
+   ============================================================ */
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+html, body { height: 100%; }
+body {
+  font-family: var(--font-body);
+  background: var(--g6);
+  color: var(--text-dark);
+  display: flex;
+  flex-direction: column;
+  min-height: 100vh;
+}
+
+/* ============================================================
+   HEADER
+   ============================================================ */
+header {
+  background: var(--g2);
+  padding: 18px 32px;
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  box-shadow: 0 2px 12px rgba(0,100,40,.2);
+}
+header .logo { font-size: 2rem; }
+header h1 {
+  font-family: var(--font-display);
+  font-size: 2.1rem;
+  letter-spacing: .12em;
+  color: var(--white);
+  line-height: 1;
+}
+header p {
+  font-size: .82rem;
+  color: rgba(255,255,255,.75);
+  margin-top: 2px;
+}
+
+/* ============================================================
+   LAYOUT PRINCIPAL
+   ============================================================ */
+.main {
+  flex: 1;
+  display: grid;
+  grid-template-columns: 1fr 220px 220px;
+  gap: 0;
+  overflow: hidden;
+}
+
+/* ============================================================
+   PAINÉIS
+   ============================================================ */
+.panel {
+  display: flex;
+  flex-direction: column;
+  padding: 20px 16px;
+  border-right: 1px solid rgba(0,163,53,.12);
+  overflow: hidden;
+}
+.panel:last-child { border-right: none; }
+.panel-a { background: var(--g5); }
+.panel-b { background: var(--g6); }
+.panel-c { background: var(--g5); }
+
+.panel-label {
+  font-size: .78rem;
+  font-weight: 700;
+  letter-spacing: .1em;
+  text-transform: uppercase;
+  color: var(--text-soft);
+  margin-bottom: 8px;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+/* ============================================================
+   TEXTAREA DOS NOMES
+   ============================================================ */
+#nomes {
+  flex: 1;
+  resize: none;
+  border: 1.5px solid rgba(0,163,53,.25);
+  border-radius: var(--radius);
+  padding: 12px;
+  font-family: var(--font-body);
+  font-size: .95rem;
+  background: var(--white);
+  color: var(--text-dark);
+  outline: none;
+  transition: border-color .2s;
+  line-height: 1.65;
+}
+#nomes:focus { border-color: var(--g2); }
+#nomes::placeholder { color: var(--text-soft); opacity: .6; }
+
+/* ============================================================
+   CONTROLES
+   ============================================================ */
+.ctrl-label {
+  font-size: .82rem;
+  font-weight: 600;
+  color: var(--text-mid);
+  margin-bottom: 4px;
+  margin-top: 14px;
+}
+.ctrl-label:first-of-type { margin-top: 0; }
+
+#qtd {
+  width: 100%;
+  padding: 9px 12px;
+  border: 1.5px solid rgba(0,163,53,.25);
+  border-radius: 10px;
+  font-family: var(--font-body);
+  font-size: 1rem;
+  background: var(--white);
+  color: var(--text-dark);
+  outline: none;
+  transition: border-color .2s;
+}
+#qtd:focus { border-color: var(--g2); }
+
+#btn-sortear {
+  margin-top: 18px;
+  width: 100%;
+  padding: 13px;
+  background: var(--g2);
+  color: var(--white);
+  font-family: var(--font-display);
+  font-size: 1.35rem;
+  letter-spacing: .1em;
+  border: none;
+  border-radius: var(--radius);
+  cursor: pointer;
+  transition: background .18s, transform .12s, box-shadow .18s;
+  box-shadow: 0 4px 16px rgba(0,163,53,.3);
+}
+#btn-sortear:hover:not(:disabled) {
+  background: var(--g1);
+  box-shadow: 0 6px 20px rgba(0,163,53,.4);
+  transform: translateY(-1px);
+}
+#btn-sortear:active:not(:disabled) { transform: translateY(0); }
+#btn-sortear:disabled { opacity: .55; cursor: not-allowed; transform: none; }
+
+#btn-exportar {
+  margin-top: 10px;
+  width: 100%;
+  padding: 10px;
+  background: transparent;
+  color: var(--g1);
+  font-family: var(--font-body);
+  font-size: .88rem;
+  font-weight: 600;
+  border: 1.5px solid var(--g2);
+  border-radius: var(--radius);
+  cursor: pointer;
+  transition: background .18s, color .18s;
+  display: none;
+}
+#btn-exportar:hover { background: var(--g5); }
+#btn-exportar.visible { display: block; }
+
+#status {
+  margin-top: 14px;
+  font-size: .82rem;
+  color: var(--text-soft);
+  line-height: 1.5;
+  min-height: 38px;
+}
+#status .tag {
+  display: inline-block;
+  background: var(--g4);
+  color: var(--text-dark);
+  border-radius: 20px;
+  padding: 2px 10px;
+  font-size: .78rem;
+  font-weight: 600;
+  margin-top: 4px;
+}
+
+/* ============================================================
+   LISTA DE SORTEADOS
+   ============================================================ */
+#lista-sorteados {
+  flex: 1;
+  overflow-y: auto;
+  scrollbar-width: thin;
+  scrollbar-color: var(--g3) transparent;
+}
+#lista-sorteados::-webkit-scrollbar { width: 5px; }
+#lista-sorteados::-webkit-scrollbar-thumb { background: var(--g3); border-radius: 10px; }
+
+.sorteado-item {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 7px 10px;
+  border-radius: 10px;
+  margin-bottom: 4px;
+  background: var(--white);
+  border: 1px solid rgba(0,163,53,.12);
+  animation: slideIn .3s ease;
+  font-size: .9rem;
+}
+.sorteado-item .num {
+  min-width: 26px;
+  height: 26px;
+  border-radius: 50%;
+  background: var(--g2);
+  color: var(--white);
+  font-size: .75rem;
+  font-weight: 700;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+}
+.sorteado-item .nome { color: var(--text-dark); font-weight: 500; }
+
+@keyframes slideIn {
+  from { opacity: 0; transform: translateX(12px); }
+  to   { opacity: 1; transform: translateX(0); }
+}
+
+/* ============================================================
+   POPUP / OVERLAY DE TELÃO
+   ============================================================ */
+#overlay {
+  position: fixed;
+  inset: 0;
+  z-index: 1000;
+  background: var(--g0);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-direction: column;
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity .4s ease;
+  overflow: hidden;
+}
+#overlay.show {
+  opacity: 1;
+  pointer-events: all;
+}
+
+/* Orbs de fundo */
+.orb {
+  position: absolute;
+  border-radius: 50%;
+  pointer-events: none;
+  filter: blur(0px);
+}
+.orb-1 { width: 560px; height: 560px; background: #004d1f; top: -120px; left: -140px; }
+.orb-2 { width: 480px; height: 480px; background: #005c22; bottom: -100px; right: -120px; }
+.orb-3 { width: 300px; height: 300px; background: #007a27; top: 40%; left: 55%; }
+
+/* Botão fechar */
+#btn-fechar {
+  position: absolute;
+  top: 22px;
+  right: 22px;
+  background: var(--red);
+  color: var(--white);
+  border: none;
+  border-radius: 10px;
+  padding: 10px 22px;
+  font-family: var(--font-body);
+  font-size: 1rem;
+  font-weight: 700;
+  cursor: pointer;
+  z-index: 10;
+  transition: background .15s, transform .1s;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+#btn-fechar:hover { background: var(--red-hover); transform: scale(1.04); }
+
+/* Conteúdo central do popup */
+.popup-inner {
+  position: relative;
+  z-index: 5;
+  text-align: center;
+  padding: 0 40px;
+  max-width: 96vw;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0;
+}
+
+#popup-emoji {
+  font-size: 7rem;
+  line-height: 1;
+  animation: bounce .6s ease;
+}
+@keyframes bounce {
+  0%   { transform: scale(.4); opacity: 0; }
+  60%  { transform: scale(1.15); }
+  100% { transform: scale(1); opacity: 1; }
+}
+
+#popup-subtitulo {
+  font-family: var(--font-display);
+  font-size: 1.6rem;
+  letter-spacing: .35em;
+  color: var(--g4);
+  margin-top: 8px;
+}
+
+#popup-numero {
+  font-family: var(--font-display);
+  font-size: 5rem;
+  color: var(--g3);
+  line-height: 1;
+  margin-top: 4px;
+  text-shadow: 0 0 40px rgba(0,196,65,.45);
+  animation: popIn .45s .15s both cubic-bezier(.34,1.56,.64,1);
+}
+
+#popup-nome {
+  font-family: var(--font-display);
+  font-size: clamp(4rem, 10vw, 10rem);
+  color: var(--white);
+  line-height: 1.05;
+  letter-spacing: .04em;
+  text-shadow: 0 4px 40px rgba(0,0,0,.4);
+  margin-top: 8px;
+  animation: popIn .5s .25s both cubic-bezier(.34,1.56,.64,1);
+  word-break: break-word;
+  max-width: 95vw;
+}
+@keyframes popIn {
+  from { opacity: 0; transform: scale(.75) translateY(20px); }
+  to   { opacity: 1; transform: scale(1) translateY(0); }
+}
+
+.popup-divider {
+  width: min(600px, 80vw);
+  height: 3px;
+  background: linear-gradient(90deg, transparent, var(--g4), transparent);
+  margin: 18px auto 14px;
+}
+
+#popup-hint {
+  font-size: .95rem;
+  color: rgba(184,240,204,.55);
+  letter-spacing: .05em;
+}
+
+/* Confetes */
+.confete {
+  position: absolute;
+  width: 10px;
+  height: 10px;
+  border-radius: 2px;
+  pointer-events: none;
+  animation: cair linear forwards;
+}
+@keyframes cair {
+  0%   { transform: translateY(-20px) rotate(0deg); opacity: 1; }
+  100% { transform: translateY(110vh) rotate(720deg); opacity: 0; }
+}
+
+/* ============================================================
+   RODAPÉ
+   ============================================================ */
+footer {
+  text-align: center;
+  padding: 8px;
+  font-size: .75rem;
+  color: var(--text-soft);
+  border-top: 1px solid rgba(0,163,53,.1);
+  background: var(--g6);
+}
+</style>
+</head>
+<body>
+
+<!-- HEADER -->
+<header>
+  <span class="logo">🏆</span>
+  <div>
+    <h1>SORTEIO ANIMADO</h1>
+    <p>Criado por JP ARAUJO</p>
+  </div>
+</header>
+
+<!-- LAYOUT PRINCIPAL -->
+<div class="main">
+
+  <!-- COLUNA A: Nomes -->
+  <div class="panel panel-a">
+    <div class="panel-label">📋 Nomes para sortear (1 por linha)</div>
+    <textarea id="nomes" placeholder="Digite ou cole os nomes aqui&#10;Um por linha&#10;&#10;Ex:&#10;Maria Silva&#10;João Santos&#10;Ana Lima"></textarea>
+  </div>
+
+  <!-- COLUNA B: Controles -->
+  <div class="panel panel-b">
+    <div class="panel-label">⚙️ Configurar</div>
+
+    <div class="ctrl-label">Quantidade a sortear</div>
+    <input id="qtd" type="number" value="1" min="1"/>
+
+    <button id="btn-sortear" onclick="iniciarSorteio()">🎲 INICIAR SORTEIO</button>
+    <button id="btn-exportar" onclick="exportarTxt()">📄 Exportar resultado .txt</button>
+
+    <div id="status">Aguardando início…</div>
+  </div>
+
+  <!-- COLUNA C: Sorteados -->
+  <div class="panel panel-c">
+    <div class="panel-label">🏅 Sorteados</div>
+    <div id="lista-sorteados"></div>
+  </div>
+
+</div>
+
+<!-- RODAPÉ -->
+<footer>Clique em qualquer lugar do popup, pressione Esc ou o botão Fechar para avançar</footer>
+
+<!-- POPUP TELÃO -->
+<div id="overlay" onclick="fecharPopup()">
+  <!-- orbs decorativos -->
+  <div class="orb orb-1"></div>
+  <div class="orb orb-2"></div>
+  <div class="orb orb-3"></div>
+
+  <button id="btn-fechar" onclick="event.stopPropagation(); fecharPopup()">✕ FECHAR</button>
+
+  <div class="popup-inner" onclick="event.stopPropagation()">
+    <div id="popup-emoji">🎉</div>
+    <div id="popup-subtitulo">✦ SORTEADO ✦</div>
+    <div id="popup-numero">#1</div>
+    <div id="popup-nome">Nome</div>
+    <div class="popup-divider"></div>
+    <div id="popup-hint">Clique em qualquer lugar &bull; Pressione Esc &bull; Botão FECHAR no canto</div>
+  </div>
+</div>
+
+<script>
+// ============================================================
+// ESTADO GLOBAL
+// ============================================================
+const emojis = ["🎉","🎁","🍀","✨","🥳","🎊","🏆","😄","😉","😯"];
+let filaSorteio   = [];
+let sorteados     = [];
+let nomesTodos    = [];
+let popupAberto   = false;
+let callbackAposFecha = null;
+let timerAutoFechar   = null;
+
+// ============================================================
+// UTILITÁRIOS
+// ============================================================
+function embaralhar(arr) {
+  const a = [...arr];
+  for (let i = a.length - 1; i > 0; i--) {
+    const j = Math.floor(Math.random() * (i + 1));
+    [a[i], a[j]] = [a[j], a[i]];
+  }
+  return a;
+}
+
+function emojiAleatorio() {
+  return emojis[Math.floor(Math.random() * emojis.length)];
+}
+
+function setStatus(html) {
+  document.getElementById("status").innerHTML = html;
+}
+
+// ============================================================
+// INICIAR SORTEIO
+// ============================================================
+function iniciarSorteio() {
+  const texto = document.getElementById("nomes").value.trim();
+  if (!texto) { alert("Insira pelo menos um nome."); return; }
+
+  nomesTodos = texto.split("\n").map(n => n.trim()).filter(Boolean);
+  const qtd  = parseInt(document.getElementById("qtd").value, 10);
+
+  if (isNaN(qtd) || qtd <= 0) { alert("Informe uma quantidade válida."); return; }
+  if (qtd > nomesTodos.length) { alert("Quantidade maior que o número de nomes."); return; }
+
+  filaSorteio = embaralhar(nomesTodos).slice(0, qtd);
+  sorteados   = [];
+
+  document.getElementById("lista-sorteados").innerHTML = "";
+  document.getElementById("btn-sortear").disabled = true;
+  document.getElementById("btn-exportar").classList.remove("visible");
+
+  setStatus(`Sorteando <span class="tag">${qtd} de ${nomesTodos.length}</span>`);
+
+  mostrarProximo(0);
+}
+
+// ============================================================
+// LOOP DE SORTEIO
+// ============================================================
+function mostrarProximo(index) {
+  if (index >= filaSorteio.length) {
+    setStatus(`✅ Sorteio finalizado! <span class="tag">${sorteados.length} sorteado(s)</span>`);
+    document.getElementById("btn-sortear").disabled = false;
+    document.getElementById("btn-exportar").classList.add("visible");
+    return;
+  }
+
+  const nome   = filaSorteio[index];
+  const numero = index + 1;
+  const emoji  = emojiAleatorio();
+
+  sorteados.push({ numero, nome });
+
+  // Atualiza lista lateral
+  const lista = document.getElementById("lista-sorteados");
+  const item  = document.createElement("div");
+  item.className = "sorteado-item";
+  item.innerHTML = `<span class="num">${numero}</span><span class="nome">${nome}</span>`;
+  lista.appendChild(item);
+  lista.scrollTop = lista.scrollHeight;
+
+  // Exibe popup e agenda próximo
+  mostrarPopup(nome, numero, emoji, () => {
+    setTimeout(() => mostrarProximo(index + 1), 500);
+  });
+}
+
+// ============================================================
+// POPUP TELÃO
+// ============================================================
+function mostrarPopup(nome, numero, emoji, callback) {
+  callbackAposFecha = callback;
+
+  document.getElementById("popup-emoji").textContent   = emoji;
+  document.getElementById("popup-subtitulo").textContent = `✦  ${numero}º SORTEADO  ✦`;
+  document.getElementById("popup-numero").textContent  = `#${numero}`;
+  document.getElementById("popup-nome").textContent    = nome;
+
+  const overlay = document.getElementById("overlay");
+  overlay.classList.add("show");
+  popupAberto = true;
+
+  // Confetes
+  lancarConfetes();
+
+  // Fecha automaticamente após 7 s
+  if (timerAutoFechar) clearTimeout(timerAutoFechar);
+  timerAutoFechar = setTimeout(fecharPopup, 7000);
+}
+
+function fecharPopup() {
+  if (!popupAberto) return;
+  popupAberto = false;
+  if (timerAutoFechar) { clearTimeout(timerAutoFechar); timerAutoFechar = null; }
+
+  const overlay = document.getElementById("overlay");
+  overlay.classList.remove("show");
+
+  // Limpa confetes
+  overlay.querySelectorAll(".confete").forEach(c => c.remove());
+
+  if (callbackAposFecha) {
+    const cb = callbackAposFecha;
+    callbackAposFecha = null;
+    cb();
+  }
+}
+
+document.addEventListener("keydown", e => { if (e.key === "Escape") fecharPopup(); });
+
+// ============================================================
+// CONFETES
+// ============================================================
+function lancarConfetes() {
+  const overlay = document.getElementById("overlay");
+  const cores = ["#00c441","#b8f0cc","#ffffff","#00a335","#e6f9ed","#7fffaa","#00ff80"];
+  for (let i = 0; i < 70; i++) {
+    const c = document.createElement("div");
+    c.className = "confete";
+    c.style.cssText = `
+      left: ${Math.random() * 100}vw;
+      top: -20px;
+      background: ${cores[Math.floor(Math.random() * cores.length)]};
+      width: ${6 + Math.random() * 8}px;
+      height: ${6 + Math.random() * 8}px;
+      border-radius: ${Math.random() > .5 ? "50%" : "2px"};
+      animation-duration: ${2 + Math.random() * 3}s;
+      animation-delay: ${Math.random() * 1.5}s;
+    `;
+    overlay.appendChild(c);
+    c.addEventListener("animationend", () => c.remove());
+  }
+}
+
+// ============================================================
+// EXPORTAR TXT
+// ============================================================
+function exportarTxt() {
+  const agora = new Date();
+  const pad   = n => String(n).padStart(2, "0");
+  const data  = `${pad(agora.getDate())}/${pad(agora.getMonth()+1)}/${agora.getFullYear()}`;
+  const hora  = `${pad(agora.getHours())}:${pad(agora.getMinutes())}:${pad(agora.getSeconds())}`;
+  const sep   = "=".repeat(47);
+
+  const nomesSorteados = sorteados.map(s => s.nome);
+
+  let txt = "";
+  txt += sep + "\n";
+  txt += "        RESULTADO DO SORTEIO\n";
+  txt += sep + "\n";
+  txt += `  Data/Hora         : ${data} ${hora}\n`;
+  txt += `  Total na lista    : ${nomesTodos.length} pessoa(s)\n`;
+  txt += `  Total sorteado(s) : ${sorteados.length} pessoa(s)\n`;
+  txt += sep + "\n\n";
+  txt += "  ORDEM DO SORTEIO:\n\n";
+  sorteados.forEach(s => {
+    txt += `  ${String(s.numero).padStart(3, " ")}. ${s.nome}\n`;
+  });
+  txt += "\n" + sep + "\n";
+  txt += "  LISTA COMPLETA DE PARTICIPANTES:\n\n";
+  nomesTodos.forEach((nome, i) => {
+    const marcador = nomesSorteados.includes(nome) ? "  [SORTEADO]" : "";
+    txt += `  ${String(i+1).padStart(3, " ")}. ${nome}${marcador}\n`;
+  });
+  txt += "\n" + sep + "\n";
+
+  // Download
+  const blob = new Blob([txt], { type: "text/plain;charset=utf-8" });
+  const url  = URL.createObjectURL(blob);
+  const a    = document.createElement("a");
+  const ts   = `${agora.getFullYear()}${pad(agora.getMonth()+1)}${pad(agora.getDate())}_${pad(agora.getHours())}${pad(agora.getMinutes())}${pad(agora.getSeconds())}`;
+  a.href     = url;
+  a.download = `sorteio_${ts}.txt`;
+  a.click();
+  URL.revokeObjectURL(url);
+}
+</script>
+</body>
+</html>
