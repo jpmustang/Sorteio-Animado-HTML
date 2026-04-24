@@ -13,7 +13,7 @@ Ideal para:
 
 ## 🚀 Acesse o projeto
 
-👉 *(adicione aqui o link após publicar na Vercel)*
+👉 *https://sorteio-animado-html.vercel.app/*
 
 ---
 
@@ -29,7 +29,6 @@ Ideal para:
 ## 🛠️ Tecnologias utilizadas
 
 * HTML5
-* CSS3 *(opcional)*
 * JavaScript (Vanilla)
 
 ---
