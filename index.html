@@ -139,7 +139,7 @@ header p {
 }
 .ctrl-label:first-of-type { margin-top: 0; }
 
-#qtd {
+#qtd, #tempo {
   width: 100%;
   padding: 9px 12px;
   border: 1.5px solid rgba(0,163,53,.25);
@@ -151,7 +151,7 @@ header p {
   outline: none;
   transition: border-color .2s;
 }
-#qtd:focus { border-color: var(--g2); }
+#qtd:focus, #tempo:focus { border-color: var(--g2); }
 
 #btn-sortear {
   margin-top: 18px;
@@ -383,6 +383,24 @@ header p {
   letter-spacing: .05em;
 }
 
+/* Barra de progresso do tempo */
+#popup-progressbar {
+  width: min(600px, 80vw);
+  height: 4px;
+  background: rgba(184,240,204,.2);
+  border-radius: 2px;
+  margin-top: 10px;
+  overflow: hidden;
+}
+#popup-progressbar-inner {
+  height: 100%;
+  width: 100%;
+  background: var(--g3);
+  border-radius: 2px;
+  transform-origin: left;
+  transition: none;
+}
+
 /* Confetes */
 .confete {
   position: absolute;
@@ -437,6 +455,9 @@ footer {
     <div class="ctrl-label">Quantidade a sortear</div>
     <input id="qtd" type="number" value="1" min="1"/>
 
+    <div class="ctrl-label">Tempo de tela (segundos)</div>
+    <input id="tempo" type="number" value="7" min="1" max="300"/>
+
     <button id="btn-sortear" onclick="iniciarSorteio()">🎲 INICIAR SORTEIO</button>
     <button id="btn-exportar" onclick="exportarTxt()">📄 Exportar resultado .txt</button>
 
@@ -469,6 +490,7 @@ footer {
     <div id="popup-numero">#1</div>
     <div id="popup-nome">Nome</div>
     <div class="popup-divider"></div>
+    <div id="popup-progressbar"><div id="popup-progressbar-inner"></div></div>
     <div id="popup-hint">Clique em qualquer lugar &bull; Pressione Esc &bull; Botão FECHAR no canto</div>
   </div>
 </div>
@@ -503,6 +525,11 @@ function emojiAleatorio() {
 
 function setStatus(html) {
   document.getElementById("status").innerHTML = html;
+}
+
+function getTempo() {
+  const v = parseInt(document.getElementById("tempo").value, 10);
+  return (isNaN(v) || v < 1) ? 7 : v;
 }
 
 // ============================================================
@@ -576,12 +603,24 @@ function mostrarPopup(nome, numero, emoji, callback) {
   overlay.classList.add("show");
   popupAberto = true;
 
+  // Barra de progresso
+  const bar = document.getElementById("popup-progressbar-inner");
+  bar.style.transition = "none";
+  bar.style.transform  = "scaleX(1)";
+  const tempoMs = getTempo() * 1000;
+  requestAnimationFrame(() => {
+    requestAnimationFrame(() => {
+      bar.style.transition = `transform ${tempoMs}ms linear`;
+      bar.style.transform  = "scaleX(0)";
+    });
+  });
+
   // Confetes
   lancarConfetes();
 
-  // Fecha automaticamente após 7 s
+  // Fecha automaticamente após o tempo configurado
   if (timerAutoFechar) clearTimeout(timerAutoFechar);
-  timerAutoFechar = setTimeout(fecharPopup, 7000);
+  timerAutoFechar = setTimeout(fecharPopup, tempoMs);
 }
 
 function fecharPopup() {
